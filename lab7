@@ -1,0 +1,154 @@
+# include <stdio.h>
+# include <stdlib.h>
+
+float** matrixInitialization(int row_count, int col_count);
+void matrixInput(float** matrix, int row_count, int col_count);
+void freeMatrix(float** matrix, int col_count);
+void printMatrix(float** matrix, int row_count, int col_count);
+void sortMatrix(float** matrix, int row_count, int col_count);
+
+int main(void) {
+	printf("Input row quantity: ");
+	int row_count;
+	scanf_s("%d", &row_count);
+	while (row_count < 2) {
+		printf(("Insert correct size of matrix: "));
+		scanf_s("%d", &row_count);
+	}
+	printf("Input column quantity: ");
+	int col_count;
+	scanf_s("%d", &col_count);
+	while (col_count < 2) {
+		printf(("Insert correct size of matrix: "));
+		scanf_s("%d", &col_count);
+	}
+	float** matrix = matrixInitialization(row_count, col_count);
+	printf("Insert matrix elements: ");
+	matrixInput(matrix, row_count, col_count);
+	printf("\n\n");
+	printf("Matrix was:");
+	printf("\n\n");
+	printMatrix(matrix, row_count, col_count);
+	printf("\n\n");
+	sortMatrix(matrix, row_count, col_count);
+	printf("Matrix become:");
+	printf("\n\n");
+	printMatrix(matrix, row_count, col_count);
+	freeMatrix(matrix, row_count);
+	return 0;
+}
+
+float** matrixInitialization(int row_count, int col_count) {
+	float** matrix = (float**)malloc(row_count * sizeof(float));
+	if (matrix == NULL) {
+		printf("Error! start from the beginning");
+		return 0;
+	}
+	for (int i = 0; i < row_count; i++) {
+		*(matrix + i) = (float*)malloc(col_count * sizeof(float));
+		if (*(matrix + i) == NULL) {
+			printf("Error! start from the beginning");
+			return 0;
+		}
+	}
+	return matrix;
+}
+
+void matrixInput(float** matrix, int row_count, int col_count) {
+	for (int i = 0; i < row_count; i++)
+		for (int j = 0; j < col_count; j++)
+			scanf_s("%f", &(*(*(matrix + i) + j)));
+}
+
+void printMatrix(float** matrix, int row_count, int col_count) {
+	printf("\n \n");
+	int k = 0;
+	for (int i = 0; i < row_count; i++) {
+		for (int j = 0; j < col_count; j++) {
+			printf("%5.1f  ", *(*(matrix + i) + j));
+			k++;
+			if ((k % col_count) == 0) {
+				printf("\n \n");
+			}
+		}
+	}
+}
+
+void freeMatrix(float** matrix, int row_count) {
+	for (int i = 0; i < row_count; i++) {
+		free(*(matrix + i));
+	}
+	free(matrix);
+}
+
+void sortMatrix(float** matrix, int row_count, int col_count) {
+	float current = 0;
+	float next = 0;
+	float tmp = 0;
+	for (int k = 0; k < 100; k++) {
+		for (int j = 0; j < col_count; j++) {
+			if (j % 2 == 0) {
+				for (int i = 0; i < row_count; i++) {
+					if (i == row_count - 1) {
+						next = *(*(matrix + i) + j + 1);
+						if (next < *(*(matrix + i) + j)) {
+							tmp = *(*(matrix + i) + j);
+							*(*(matrix + i) + j) = *(*(matrix + i) + j + 1);
+							*(*(matrix + i) + j + 1) = tmp;
+						}
+					}
+					else {
+						next = *(*(matrix + i + 1) + j);
+						if (next < *(*(matrix + i) + j)) {
+							tmp = *(*(matrix + i) + j);
+							*(*(matrix + i) + j) = *(*(matrix + i + 1) + j);
+							*(*(matrix + i + 1) + j) = tmp;
+						}
+					}
+				}
+			}
+			else {
+				for (int i = row_count - 1; i >= 0; i--) {
+					if (i == 0) {
+						next = *(*(matrix + i) + j + 1);
+						if (next < *(*(matrix + i) + j)) {
+							tmp = *(*(matrix + i) + j);
+							*(*(matrix + i) + j) = *(*(matrix + i) + j + 1);
+							*(*(matrix + i) + j + 1) = tmp;
+						}
+					}
+					else {
+						next = *(*(matrix + i - 1) + j);
+						if (next < *(*(matrix + i) + j)) {
+							tmp = *(*(matrix + i) + j);
+							*(*(matrix + i) + j) = *(*(matrix + i - 1) + j);
+							*(*(matrix + i - 1) + j) = tmp;
+						}
+					}
+				}
+			}
+		}
+	}
+	for (int j = 0; j < col_count; j++) {
+		if (j % 2 == 0) {
+			for (int i = 0; i < row_count; i++) {
+				if (i == row_count - 1) {
+					*(*(matrix + i) + j) = *(*(matrix + i) + j + 1);
+				}
+				else {
+					*(*(matrix + i) + j) = *(*(matrix + i + 1) + j);
+				}
+			}
+		}
+		else {
+			for (int i = row_count - 1; i >= 0; i--) {
+				if (i == 0) {
+					*(*(matrix + i) + j) = *(*(matrix + i) + j + 1);
+				}
+				else {
+					*(*(matrix + i) + j) = *(*(matrix + i - 1) + j);
+				}
+			}
+		}
+	}
+}
