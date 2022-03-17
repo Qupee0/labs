@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+char* enterLine();
+char* deleteSpace(char* str, int count);
+char* deleteSpacesBeforeSymbols(char* str, int count);
+
+int main() {
+	size_t memmory = 100, count = 0;
+	char* str = (char*)calloc(memmory, sizeof(char));
+	printf("enter your line: ");
+	scanf_s("%c", str + count);
+	while (*(str + count) != '\n') {
+		count++;
+		if (count == memmory) {
+			memmory *= 2;
+			str = (char*)realloc(str, memmory * sizeof(char));
+		}
+		scanf_s("%c", str + count);
+	}
+	str = deleteSpacesBeforeSymbols(deleteSpace(str, count),count);
+	printf("%s",str );
+	return 0;
+}
+
+char* deleteSpace(char* str, int count)
+{
+	char memory = 0;
+	for (int q = 0; q < count - 1; q++) {
+		if ((*(str + q) == ' ') && (q == 0)) {
+			for (int p = q; p < count; p++) {
+				memory = *(str + p + 1);
+				*(str + p) = memory;
+				*(str + p + 1) = '\0';
+			}
+			q--;
+		}
+		else if ((*(str + q) == *(str + q + 1)) && (*(str + q) == ' ')) {
+			for (int p = q; p < count; p++) {
+				memory = *(str + p + 1);
+				*(str + p) = memory;
+				*(str + p + 1) = '\0';
+			}
+			q--;
+		}
+	}
+	return str;
+}
+
+char* deleteSpacesBeforeSymbols(char* str, int count)
+{
+	char memory = 0;
+	char punctuationSet[4];
+	*(punctuationSet + 0) = ',';
+	*(punctuationSet + 1) = '.';
+	*(punctuationSet + 2) = '!';
+	*(punctuationSet + 3) = '?';
+	for (int i = 0; i < count - 1; i++) {
+		for (int j = 0; j < 4; j++) {
+			if ((*(str + i + 1) == *(punctuationSet + j)) && (*(str + i) == ' ')) {
+				for (int j1 = i; j1 < count; j1++) {
+					memory = *(str + j1 + 1);
+					*(str + j1) = memory;
+					*(str + j1 + 1) = '\0';
+				}
+				i--;
+			}
+		}
+	}
+	return str;
+}
+
+/*size_t strlen(const char* str)
+{
+	size_t res = 0;
+	while (*str++)
+		res++;
+	return res;
+}
+
+const char* strstr(const char* str1, const char* str2)
+{
+	size_t i, j, f;
+	for (i = 0; i < strlen(str1) - strlen(str2) + 1; i++)
+	{
+		f = 0;
+		for (j = 0; j < strlen(str2); j++)
+		{
+			if (str1[i + j] == str2[j]) f++;
+		}
+		if (f == strlen(str2)) return str1 + i;
+	}
+	if (strlen(str2))
+		return NULL;
+	else
+		return str1;
+}
+
+char* strcpy(char* dest, const char* stc) {
+	for (int i = 0; (*(dest + i) = *(stc + i)); i++);
+	return dest;
+}
+
+void removespace(char* str) {
+	char* wp;
+	while (wp == strstr(str, "  ")) {
+		strcpy(wp, wp + 1);
+	}
+}*/
