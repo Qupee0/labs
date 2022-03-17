@@ -1,0 +1,133 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string>
+using namespace std;
+
+char* inpuString();
+void outputMatrix(char** matrix, int wordsCount, int* countOfThisWord);
+char* deleteSpaces(char* str, int count);
+char** wordMatrix(char* str, int countMatrix);
+size_t strlen(char* str);
+char* clearStr(char* str, int count);
+void countOfThisWord(char** matrix, int wordsCount);
+
+int main()
+{
+    int wordsCount = 1;
+    char* str;
+    printf("Enter your string (pls, enter the whitespace in the end of string): ");
+    str = inpuString();
+    for (int i = 0; i < strlen(str); i++) {
+        if (*(str + i) == ' ')
+            wordsCount++;
+    }
+    countOfThisWord(wordMatrix(str, wordsCount), wordsCount);
+    return 0;
+}
+
+char** wordMatrix(char* str, int wordsCount)
+{
+    int start = 0, end = -1, k = 0;
+    char** wordMatrix = (char**)calloc(wordsCount + 1, sizeof(char*));
+    for (int i = 0; i < strlen(str) + 1; i++) {
+        if (*(str + i) == ' ') {
+            start = end + 1;
+            end = i;
+            k++;
+        } else {
+            int c = 0;
+            char* bufStr = (char*)calloc(i, sizeof(char));
+            for (int j = start; j < end; j++) {
+                *(bufStr + c) = *(str + j);
+                c++;
+            }
+            bufStr = clearStr(bufStr, (end - start));
+            *(wordMatrix + k) = bufStr;
+        }  
+    }
+    return wordMatrix;
+}
+
+size_t strlen(char* str)
+{
+    size_t size = 0;
+    for (size = 0; *(str + size); ++size);
+    return size;
+}
+char* inpuString()
+{
+    size_t capacity = 10, count = 0;
+    char* str = (char*)calloc(capacity, sizeof(char));
+    scanf_s("%c", str + count);
+    while (*(str + count) != '\n') {
+        count++;
+        if (count == capacity) {
+            capacity *= 2;
+            str = (char*)realloc(str, capacity * sizeof(char));
+        }
+        scanf_s("%c", str + count);
+    }
+    str = deleteSpaces(clearStr(str, count), count);
+    return str;
+}
+
+char* clearStr(char* str, int count)
+{
+    char* strWithoutTrash = (char*)calloc(count + 1, sizeof(char));
+    for (int i = 0; i < count; i++)
+        *(strWithoutTrash + i) = *(str + i);
+    return strWithoutTrash;
+}
+
+void outputMatrix(char** matrix, int wordsCount, int* countOfThisWord)
+{
+    for (int i = 1; i < wordsCount; i++)
+        printf("%s - %d\n", *(matrix + i), *(countOfThisWord + i));
+    free(countOfThisWord);
+}
+
+void countOfThisWord(char** matrix, int wordsCount)
+{
+    int* countOfThisWord = (int*)malloc(wordsCount * sizeof(int));
+    for (int i = 0; i < wordsCount; i++)
+        *(countOfThisWord + i) = 1;
+    for (int k = 0; k < 10; k++) {
+        for (int i = 1; i < wordsCount; i++) {
+            string word = *(matrix + i);
+            for (int j = i + 1; j < wordsCount; j++) {
+                string word1 = *(matrix + j);
+                if (word == word1) {
+                    *(countOfThisWord + i) += 1;
+                    for (int k = j; k < wordsCount; k++)
+                        *(matrix + k) = *(matrix + k + 1);
+                    wordsCount--;
+                }
+            }
+        }
+    }
+    outputMatrix(matrix, wordsCount, countOfThisWord);
+}
+
+char* deleteSpaces(char* str, int count)
+{
+    char memory = 0;
+    for (int i = 0; i < count - 1; i++) {
+        if ((*(str + i) == ' ') && (i == 0)) {
+            for (int j = i; j < count; j++) {
+                memory = *(str + j + 1);
+                *(str + j) = memory;
+                *(str + j + 1) = '\0';
+            }
+            i--;
+        }
+        else if ((*(str + i) == *(str + i + 1)) && (*(str + i) == ' ')) {
+            for (int j = i; j < count; j++) {
+                memory = *(str + j + 1);
+                *(str + j) = memory;
+                *(str + j + 1) = '\0';
+            }
+            i--;
+        }
+    }
+    return str;
+}
