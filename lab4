@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include<malloc.h>
+#include<conio.h>
+
+int main()
+{
+	int size, i = 0, min = 0, max = 0, c = 0, sum = 0, imax = 0,count = 0;
+	printf("Enter array number");
+	scanf_s("%d", &size);
+	int* arr = (int*)malloc(size * sizeof(int));
+	max = *(arr + 0);
+	if (arr == NULL)
+		return 0;
+	printf("Enter array elements: ");
+	for (; i < size; i++) {
+		scanf_s("%d", &(*(arr + i)));
+		min = *(arr + 0);
+		if (*(arr + i) > max) {
+			max = *(arr + i);
+			imax = i;
+		}
+		if (*(arr + i) < min)
+			min = *(arr + i);
+	}
+	c = (max + min) / 2;
+	printf("(max+min)/2: %d\n", c);
+	printf("Min number: %d\n", min);
+	printf("Max number: %d\n", max);
+	for (i = imax + 1; i < size; i++) {
+		if (*(arr + i) > c)
+			sum = sum + *(arr + i);
+		count ++ 1;
+	}
+	if (count == 0);
+		printf("Error");
+	printf("%d", sum);
+	free(arr);
+	_getch();
+	return 0;
+}
