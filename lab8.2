@@ -1,0 +1,195 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include "Header.h"
+
+char* cleanTrash(char* str, int counter);
+char* enterString();
+void checkCountPeople(float* countPeople);
+void outputMatrix(char** matrix, int countPeople);
+char* deleteMoreThenOneWhitespace(char* str, int counter);
+char* changeSurname(char* matrix, char* firstEnding, char* secondEnding);
+char* cutString(char* str, char* suf1, char* suf2);
+int countOfEnterSuf1(char* surname, char* suf1);
+int checkOfEnterOfSuf1(char* surname, char* suf1);
+void freeAll(char** matrix, int countPeople, char* suf1, char* suf2);
+
+int main()
+{
+    float countPeople = 0;
+    char* suf1, * suf2;
+    checkCountPeople(&countPeople);
+    getchar();
+    printf("Enter suf1: ");
+    suf1 = enterString();
+    printf("Enter suf2: ");
+    suf2 = enterString();
+    char** matrix = (char**)calloc(countPeople, sizeof(char*));
+    if (matrix != NULL) {
+        for (int i = 0; i < countPeople; ++i) {
+            printf("Enter your string: ");
+            *(matrix + i) = cutString(enterString(), suf1, suf2);
+        }
+    }
+    else
+        printf("Memory allocation error. ");
+    outputMatrix(matrix, countPeople);
+    freeAll(matrix, countPeople, suf1, suf2);
+    return 0;
+}
+
+void checkCountPeople(float* countPeople)
+{
+    printf("Enter count of people: ");
+    scanf_s("%f", countPeople);
+    while ((*countPeople < 1) || (ceil(*countPeople) != *countPeople)) {
+        printf("Please, enter correct count of people (int + '>=1'): ");
+        scanf_s("%f", countPeople);
+    }
+}
+
+char* enterString()
+{
+    size_t capacity = 20, counter = 0;
+    char* str = (char*)calloc(capacity, sizeof(char));
+    scanf_s("%c", str + counter);
+    while (*(str + counter) != '\n') {
+        counter++;
+        if (counter == capacity) {
+            capacity *= 2;
+            str = (char*)realloc(str, capacity * sizeof(char));
+        }
+        scanf_s("%c", str + counter);
+    }
+    str = deleteMoreThenOneWhitespace(cleanTrash(str, counter), counter);
+    return str;
+}
+
+char* changeSurname(char* surname, char* suf1, char* suf2)
+{
+    int pos1 = checkOfEnterOfSuf1(surname, suf1), col = countOfEnterSuf1(surname, suf1);
+    if (pos1 != -1)
+        surname = replace(surname, suf1, suf2, col);
+    return surname;
+}
+
+char* cutString(char* str, char* suf1, char* suf2)
+{
+    char* firstPart = (char*)calloc(100, sizeof(char)), * secondPart = (char*)calloc(100, sizeof(char));
+    int j = 0, memory = 0, difference = abs(int(strlen(suf2) - strlen(suf1)));
+    for (int i = 0; i < strlen(str); i++) {
+        if (*(str + i) != ' ')
+            *(firstPart + i) = *(str + i);
+        else {
+            memory = i;
+            break;
+        }
+    }
+    for (int j = memory; j < strlen(str); j++) {
+        *(secondPart + j - memory) = *(str + j);
+    }
+    firstPart = changeSurname(firstPart, suf1, suf2);
+    for (int i = 0; i < strlen(str) + difference; i++) {
+        if (i < strlen(firstPart))
+            *(str + i) = *(firstPart + i);
+        else
+            *(str + i) = *(secondPart + i - strlen(firstPart));
+    }
+    return str;
+}
+
+char* cleanTrash(char* str, int counter)
+{
+    char* strWithoutTrash = (char*)calloc(counter + 1, sizeof(char));
+    for (int i = 0; i < counter; i++)
+        *(strWithoutTrash + i) = *(str + i);
+    return strWithoutTrash;
+}
+
+void outputMatrix(char** matrix, int countPeople)
+{
+    int check = 0;
+    for (int i = 0; i < countPeople; i++) {
+        for (int j = 0; j < strlen(*(matrix + i)); j++) {
+            if ((*(*(matrix + i) + j)) == ' ')
+                check = 1;
+        }
+        if (check == 1)
+            printf("Your new string: %s\n", *(matrix + i));
+        else
+            printf("Your new string: no 'full name'\n");
+        check = 0;
+    }
+}
+
+char* deleteMoreThenOneWhitespace(char* str, int counter)
+{
+    char memory = 0;
+    for (int i = 0; i < counter - 1; i++) {
+        if ((*(str + i) == ' ') && (i == 0)) {
+            for (int j = i; j < counter; j++) {
+                memory = *(str + j + 1);
+                *(str + j) = memory;
+                *(str + j + 1) = '\0';
+            }
+            i--;
+        }
+        else if ((*(str + i) == *(str + i + 1)) && (*(str + i) == ' ')) {
+            for (int j = i; j < counter; j++) {
+                memory = *(str + j + 1);
+                *(str + j) = memory;
+                *(str + j + 1) = '\0';
+            }
+            i--;
+        }
+    }
+    return str;
+}
+
+int countOfEnterSuf1(char* surname, char* suf1)
+{
+    int i = 0, j = 0, k = 0;
+    while (*(surname + j) != '\0') {
+        if ((*(surname + j)) == *(suf1 + 0)) {
+            for (k = 0; *(suf1 + k) != '\0'; j++, k++) {
+                if (*(suf1 + k) == '\0') {
+                    i++;
+                    j--;
+                }
+                else
+                    j--;
+            }
+        }
+        j++;
+    }
+    return i;
+}
+
+int checkOfEnterOfSuf1(char* surname, char* suf1)
+{
+    int i = -1, j, k;
+    for (j = 0; *(surname + j) != ' '; j++) {
+        if ((*(surname + j) == *(suf1 + 0))) {
+            for (k = 0; *(suf1 + k) != '\0'; j++, k++) {
+                if (*(surname + j) == '\0')
+                    break;
+                if (*(surname + j) != *(suf1 + k))
+                    break;
+            }
+            if (*(suf1 + k) == '\0') {
+                i = j - k;
+                break;
+            }
+            else
+                j--;
+        }
+    }
+    return i;
+}
+
+void freeAll(char** matrix, int countPeople, char* suf1, char* suf2)
+{
+    free(matrix);
+    free(suf1);
+    free(suf2);
+}
