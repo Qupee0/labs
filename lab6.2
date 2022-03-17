@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+float** inputMatrix(float** matrix, float countLine, float countColumn);
+void columnLine(float* countLine, float* countColumn);
+float** memoryAllocation(int countLine, int countColumn);
+void outputMatrix(float** matrix, int countLine, int countColumn);
+float summ(float** matrix, int countLine, int countColumn);
+void freeMatrix(float** matrix, int countLine, int countColumn);
+//var 2
+
+int main()
+{
+	float countLine = 0, countColumn = 0, ** matrix;
+	columnLine(&countLine, &countColumn);
+	matrix = memoryAllocation(countLine, countColumn);
+	if (matrix != NULL) {
+		matrix = inputMatrix(matrix, countLine, countColumn);
+		printf("\nMatrix was: ");
+		outputMatrix(matrix, countColumn, countLine);
+		*(*(matrix + 0) + 0) = summ(matrix, countLine, countColumn);
+		printf("\nMatrix become: ");
+		outputMatrix(matrix, countColumn, countLine);
+		freeMatrix(matrix, countLine, countColumn);
+	}
+	else {
+		printf("Memory allocation error. ");
+		return 0;
+	}
+	return 0;
+}
+
+float** inputMatrix(float** matrix, float countLine, float countColumn)
+{
+	int i = 0, j = 0;
+	if (matrix != NULL) {
+		for (int i = 0; i < countLine; i++) {
+			for (int j = 0; j < countColumn; j++) {
+				printf("matrix[%d][%d] = ", i, j);
+				scanf_s("%f", *(matrix + i) + j);
+			}
+		}
+	}
+	return matrix;
+}
+
+void columnLine(float* countLine, float* countColumn)
+{
+	printf("Enter countColumn and countLine: ");
+	scanf_s("%f%f", countLine, countColumn);
+	int countLineInt = *countLine;
+	while ((*countLine < 2) || (*countLine != *countColumn) || (ceil(*countLine) != *countLine)) {
+		printf("Please, enter correct countLine and countColumn (int + '>=2' + lines=columns): ");
+		scanf_s("%f%f", countLine, countColumn);
+		countLineInt = *countLine;
+	}
+}
+
+float summ(float** matrix, int countLine, int countColumn)
+{
+	int i = 0, j = 0;
+	float summ = 0;
+	for (int i = 0; i < countLine - 1; i++) {
+		for (int j = 0; j < countColumn - i - 1; j++) {
+			summ += *(*(matrix + (countLine - i - 1)) + countColumn - j - 1);
+		}
+	}
+	return summ;
+}
+
+float** memoryAllocation(int countLine, int countColumn)
+{
+	float** matrix = (float**)malloc(countColumn * sizeof(float*));
+	if (matrix == NULL)
+		return NULL;
+	for (int i = 0; i < countLine; i++) {
+		*(matrix + i) = (float*)malloc(countColumn * sizeof(float));
+		if (*(matrix + i) == NULL) {
+			for (; i >= 0; i--) {
+				free(*(matrix + i));
+			}
+			free(matrix);
+			return NULL;
+		}
+	}
+	return matrix;
+}
+
+void outputMatrix(float** matrix, int countColumn, int countLine)
+{
+	printf("\n");
+	for (int i = 0; i < countLine; i++) {
+		for (int j = 0; j < countColumn; j++)
+			printf("%5.2f ", *(*(matrix + i) + j));
+		printf("\n");
+	}
+}
+
+void freeMatrix(float** matrix, int countLine, int countColumn)
+{
+	for (int i = 0; i < countLine; i++) {
+		free(*(matrix + i));
+	}
+	free(matrix);
+}
