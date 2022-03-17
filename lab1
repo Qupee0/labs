@@ -1,0 +1,27 @@
+#include <stdio.h>
+
+void func(double E, int factorial, double Sn, double Sb, int n);
+
+int main()
+{
+	double E, Sn = 0, Sb = 0, check = 0;
+	int n = 1, factorial = 1;
+	printf("Enter 'E': ");
+	scanf_s("%Lf", &E);
+	func(E, factorial, Sn, Sb, n);
+}
+
+void func(double E, int factorial, double Sn, double Sb, int n)
+{
+	while (E <= 0) {
+		printf("Re-enter: ");
+		scanf_s("%Lf", &E);
+	}
+	do {
+		factorial *= n;
+		Sb = Sn;
+		Sn += (1.0 / factorial);
+		n += 1;
+	} while ((Sn - Sb) > E);
+	printf("%Lf", Sn);
+}
